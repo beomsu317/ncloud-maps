@@ -242,11 +242,11 @@ Pull requests welcome! Please follow existing code style.
 
 ## Changelog
 
-### v1.1.0 (2026-02-21)
-- **Remove Geocoding API** - Simplify to coordinates-only input
-- Coordinates must be in `longitude,latitude` format
-- Update documentation to reflect coordinate-only usage
-- Maintain backward compatibility with explicit `--api` flag
+### v1.0.2 (2026-02-21)
+- **Remove all geocoding references** - Complete removal of Geocoding API
+- Remove `lib/geocoding.ts` entirely
+- Update all code and documentation to coordinates-only API
+- Remove geocoding from keywords and package description
 - Smart Directions Routing continues to work automatically
 
 ### v1.0.1 (2026-02-21)
