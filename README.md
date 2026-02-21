@@ -252,6 +252,12 @@ Pull requests welcome! Please follow existing code style.
 
 ## Changelog
 
+### v1.0.4 (2026-02-21)
+- **Fix TypeScript build** - Add node types to tsconfig.json
+- Resolve TS2580 "Cannot find name 'process'" error
+- Resolve TS2584 "Cannot find name 'console'" error
+- Build process now works correctly
+
 ### v1.0.3 (2026-02-21)
 - **Add limitations documentation** - Clarify vehicle-only routes
 - Document that skill only supports car routes
