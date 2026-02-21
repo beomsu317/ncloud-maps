@@ -3,7 +3,6 @@
  */
 
 import axios, { AxiosError } from "axios";
-import { resolveLocation } from "./geocoding";
 
 /**
  * Directions API Types
@@ -73,6 +72,19 @@ export interface DirectionsResponse {
 }
 
 /**
+ * Parse coordinates string (lon,lat)
+ */
+function parseCoordinates(coord: string): { lon: string; lat: string } | null {
+  const parts = coord.trim().split(",");
+  if (parts.length !== 2) return null;
+  const lon = parseFloat(parts[0]);
+  const lat = parseFloat(parts[1]);
+  if (isNaN(lon) || isNaN(lat)) return null;
+  if (lon < -180 || lon > 180 || lat < -90 || lat > 90) return null;
+  return { lon: parts[0], lat: parts[1] };
+}
+
+/**
  * Directions15 API를 호출하여 경로 검색
  */
 export async function getDirections(params: DirectionsParams): Promise<ResultOutput> {
@@ -82,11 +94,11 @@ export async function getDirections(params: DirectionsParams): Promise<ResultOut
     "x-ncp-apigw-api-key": params.apiKey,
   };
 
-  // 출발지, 도착지, 경유지를 좌표로 변환
-  console.log("\n🔍 [1단계] 위치 정보 변환 (Geocoding)\n");
+  // 출발지, 도착지 좌표 파싱
+  console.log("\n🔍 [1단계] 좌표 검증\n");
   
   console.log(`📌 출발지: "${params.start}"`);
-  const startCoord = await resolveLocation(params.start, params.apiKeyId, params.apiKey);
+  const startCoord = parseCoordinates(params.start);
   if (!startCoord) {
     return {
       success: false,
@@ -98,12 +110,12 @@ export async function getDirections(params: DirectionsParams): Promise<ResultOut
       taxi_fare: 0,
       fuel_price: 0,
       departure_time: "",
-      error: `출발지 해석 실패: ${params.start}`,
+      error: `출발지 좌표 형식 오류: ${params.start}. 경도,위도 형식으로 제공해주세요 (예: 127.0683,37.4979)`,
     };
   }
 
   console.log(`\n📌 도착지: "${params.goal}"`);
-  const goalCoord = await resolveLocation(params.goal, params.apiKeyId, params.apiKey);
+  const goalCoord = parseCoordinates(params.goal);
   if (!goalCoord) {
     return {
       success: false,
@@ -115,11 +127,11 @@ export async function getDirections(params: DirectionsParams): Promise<ResultOut
       taxi_fare: 0,
       fuel_price: 0,
       departure_time: "",
-      error: `도착지 해석 실패: ${params.goal}`,
+      error: `도착지 좌표 형식 오류: ${params.goal}. 경도,위도 형식으로 제공해주세요 (예: 126.9034,37.5087)`,
     };
   }
 
-  // 경유지가 있으면 변환
+  // 경유지가 있으면 검증
   let waypointsCoord = "";
   if (params.waypoints) {
     console.log(`\n📌 경유지: "${params.waypoints}"`);
@@ -129,9 +141,22 @@ export async function getDirections(params: DirectionsParams): Promise<ResultOut
     for (let i = 0; i < waypointsList.length; i++) {
       const waypoint = waypointsList[i];
       console.log(`  경유지 ${i + 1}: "${waypoint}"`);
-      const waypointCoord = await resolveLocation(waypoint, params.apiKeyId, params.apiKey);
+      const waypointCoord = parseCoordinates(waypoint);
       if (waypointCoord) {
         resolvedWaypoints.push(`${waypointCoord.lon},${waypointCoord.lat}`);
+      } else {
+        return {
+          success: false,
+          start: params.start,
+          goal: params.goal,
+          distance: 0,
+          duration: 0,
+          toll_fare: 0,
+          taxi_fare: 0,
+          fuel_price: 0,
+          departure_time: "",
+          error: `경유지 ${i + 1} 좌표 형식 오류: ${waypoint}. 경도,위도 형식으로 제공해주세요 (예: 127.0700,37.5650)`,
+        };
       }
     }
 

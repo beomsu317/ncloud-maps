@@ -2,72 +2,7 @@
 
 Complete reference for Ncloud Maps APIs.
 
-## Geocoding API
-
-Convert addresses to coordinates.
-
-### API Endpoint
-
-```
-GET https://maps.apigw.ntruss.com/map-geocode/v2/geocode
-```
-
-### Request Headers
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `x-ncp-apigw-api-key-id` | Yes | API Key ID (Client ID) |
-| `x-ncp-apigw-api-key` | Yes | API Key Secret (Client Secret) |
-| `Accept` | Yes | application/json |
-
-### Query Parameters
-
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| `query` | String | Address to search (required) | - |
-| `coordinate` | String | Search center (longitude,latitude) | - |
-| `filter` | String | Filter results (HCODE, BCODE) | - |
-| `language` | String | Response language (kor, eng) | kor |
-| `page` | Number | Page number | 1 |
-| `count` | Number | Results per page (1-100) | 10 |
-
-### Response Format
-
-```json
-{
-  "status": "OK",
-  "meta": {
-    "totalCount": 5,
-    "page": 1,
-    "count": 5
-  },
-  "addresses": [
-    {
-      "roadAddress": "서울특별시 강남구 테헤란로 123",
-      "jibunAddress": "서울특별시 강남구 삼성동 50-1",
-      "englishAddress": "123 Teheran-ro, Gangnam-gu, Seoul, Republic of Korea",
-      "x": "127.0652",
-      "y": "37.4979",
-      "distance": 0.0
-    }
-  ],
-  "errorMessage": ""
-}
-```
-
-### Response Status
-
-| HTTP Status | Code | Meaning |
-|-------------|------|---------|
-| 200 | OK | Success |
-| 400 | INVALID_REQUEST | Bad request |
-| 500 | SYSTEM_ERROR | Server error |
-
----
-
 ## Directions15 API
-
-
 
 ## API Endpoint
 

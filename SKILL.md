@@ -1,15 +1,15 @@
 ---
 name: ncloud-maps
-description: "Query Naver Cloud Maps APIs for route navigation and geocoding. Smart routing: Directions5 by default, auto-switches to Directions15 for 5+ waypoints."
+description: "Query Naver Cloud Maps APIs for route navigation. Smart routing: Directions5 by default, auto-switches to Directions15 for 5+ waypoints."
 ---
 
 # Ncloud Maps
 
-Query Naver Cloud Maps APIs for intelligent routing (Directions5 + Directions15) and address-to-coordinate conversion (Geocoding).
+Query Naver Cloud Maps APIs for intelligent routing (Directions5 + Directions15).
 
 ## Key Feature: Smart Routing
 
-**v1.0.1+** — By default, the skill uses **Directions5** for queries with fewer than 5 waypoints, and automatically switches to **Directions15** when you have 5 or more waypoints. No manual selection needed.
+**v1.1.0+** — By default, the skill uses **Directions5** for queries with fewer than 5 waypoints, and automatically switches to **Directions15** when you have 5 or more waypoints. No manual selection needed.
 
 | Waypoints | API Used | Max Waypoints |
 |-----------|----------|---------------|
@@ -21,7 +21,7 @@ Query Naver Cloud Maps APIs for intelligent routing (Directions5 + Directions15)
 1. **Get API credentials from Naver Cloud Console:**
    - Create/register an Application in Naver Cloud Console
    - Obtain `Client ID` (API Key ID) and `Client Secret` (API Key)
-   - Enable "Maps Geocoding" and "Maps Directions15" APIs
+   - Enable "Maps Directions15" API
 
 2. **Set environment variables (or use .env file):**
 
@@ -51,31 +51,23 @@ By default, no `--api` flag needed. The skill automatically:
 - Uses **Directions5** for 0–4 waypoints (faster)
 - Switches to **Directions15** for 5+ waypoints (necessary)
 
+Provide coordinates in `longitude,latitude` format:
+
 ```bash
 # 0–4 waypoints → Directions5 (automatic)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
-  --waypoints "서울역|용산역"
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
+  --waypoints "127.0100,37.5000|127.0200,37.5100"
 
 # 5+ waypoints → Directions15 (automatic)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
-  --waypoints "서울역|용산역|옥수역|성동구청역|광나루역"
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
+  --waypoints "127.0100,37.5000|127.0200,37.5100|127.0300,37.5200|127.0400,37.5300|127.0500,37.5400"
 ```
 
-### Basic route query by address (Geocoding → Smart Directions)
-
-```bash
-npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역"
-```
-
-Automatically resolves both addresses to coordinates, then queries the route.
-
-### Route query by coordinates (direct)
+### Basic route query by coordinates (direct)
 
 ```bash
 npx ts-node scripts/index.ts \
@@ -90,52 +82,34 @@ If you need to override the smart routing:
 ```bash
 # Force Directions5 (max 5 waypoints)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --api directions5 \
-  --waypoints "서울역|용산역"
+  --waypoints "127.0100,37.5000|127.0200,37.5100"
 
 # Force Directions15 (max 15 waypoints)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --api directions15 \
-  --waypoints "서울역|용산역|옥수역|성동구청역|광나루역"
+  --waypoints "127.0100,37.5000|127.0200,37.5100|127.0300,37.5200|127.0400,37.5300|127.0500,37.5400"
 ```
 
-### Basic route query by address (Geocoding → Directions15)
-
-```bash
-npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역"
-```
-
-Automatically resolves both addresses to coordinates, then queries the route.
-
-### Route query by coordinates (direct)
+### With waypoints (coordinates only)
 
 ```bash
 npx ts-node scripts/index.ts \
   --start "127.0683,37.4979" \
-  --goal "126.9034,37.5087"
+  --goal "126.9034,37.5087" \
+  --waypoints "127.0100,37.5000"
 ```
 
-### With waypoints (addresses or coordinates)
-
-```bash
-npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
-  --waypoints "서울역"
-```
-
-Mixed format also works:
+Multiple waypoints:
 ```bash
 npx ts-node scripts/index.ts \
   --start "127.0683,37.4979" \
-  --goal "신도림역" \
-  --waypoints "126.9700,37.5650"
+  --goal "126.9034,37.5087" \
+  --waypoints "127.0100,37.5000|127.0200,37.5100"
 ```
 
 ### Route options
@@ -144,8 +118,8 @@ Choose from: `trafast` (fast), `tracomfort` (comfort), `traoptimal` (default), `
 
 ```bash
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --option "traavoidtoll"
 ```
 
@@ -153,8 +127,8 @@ npx ts-node scripts/index.ts \
 
 ```bash
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --cartype 2 \
   --fueltype "diesel" \
   --mileage 10.5
@@ -175,8 +149,8 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 ```json
 {
   "success": true,
-  "start": "강남역",
-  "goal": "신도림역",
+  "start": "127.0683,37.4979",
+  "goal": "126.9034,37.5087",
   "distance": 12850,
   "duration": 1145000,
   "toll_fare": 0,
@@ -189,8 +163,8 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 ### Response Fields
 
 - `success` - Whether the query succeeded
-- `start` - Starting point (input address or coordinates)
-- `goal` - Destination (input address or coordinates)
+- `start` - Starting point coordinates
+- `goal` - Destination coordinates
 - `distance` - Total distance in meters
 - `duration` - Total duration in milliseconds (÷1000 = seconds)
 - `toll_fare` - Toll/highway fare in KRW
@@ -201,18 +175,18 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 
 ## How It Works
 
-1. **Address Resolution (Geocoding)**
-   - Input: User provides address (e.g., "강남역") or coordinates (e.g., "127.0683,37.4979")
-   - If address → Geocoding API converts to coordinates
-   - If coordinates → Used directly
+1. **Coordinate Validation**
+   - Input: User provides coordinates in `longitude,latitude` format
+   - Validates format and range
+   - Returns error if format is invalid
 
-2. **Route Calculation (Directions15)**
-   - Resolved coordinates sent to Directions15 API
+2. **Route Calculation (Directions15 or Directions5)**
+   - Coordinates sent to appropriate Directions API
    - Returns distance, duration, tolls, taxi fare, fuel cost
 
 3. **Waypoints Support**
-   - Each waypoint resolved individually (address or coordinate)
-   - All resolved coordinates sent to Directions15
+   - Each waypoint must be in `longitude,latitude` format
+   - All coordinates sent to Directions API
 
 ## Environment Variables
 
@@ -226,18 +200,14 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 - 0–4 waypoints: Directions5 API (max 5 waypoints)
 - 5+ waypoints: Directions15 API (max 15 waypoints)
 
-**Geocoding:**
-- 10 results per query (configurable)
-
 **General:**
-- Max 10 destination alternatives (via `:` separator in goal)
 - Real-time traffic information included
 - Request rate limits apply per your Naver Cloud plan
 
 ## Error Handling
 
 Common errors:
-- `Could not resolve start/goal location` - Address not found (try different spelling/format)
+- `좌표 형식 오류` - Invalid coordinate format (use `longitude,latitude`)
 - `Authentication Failed` - Invalid API credentials
 - `Quota Exceeded` - API rate limit hit
 - `No routes found` - No valid route between points
@@ -245,7 +215,7 @@ Common errors:
 Check Naver Cloud Console for:
 - API enablement for your application
 - Quota/rate limit status
-- Valid coordinates/addresses
+- Valid coordinates
 
 ## References
 

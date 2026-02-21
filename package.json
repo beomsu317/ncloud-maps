@@ -1,7 +1,7 @@
 {
   "name": "ncloud-maps-skill",
-  "version": "1.0.1",
-  "description": "Naver Cloud Maps Directions15 + Geocoding API skill for OpenClaw. Convert addresses to coordinates and calculate driving routes with distance, duration, tolls, taxi fare, and fuel cost.",
+  "version": "1.1.0",
+  "description": "Naver Cloud Maps Directions API skill for OpenClaw. Calculate driving routes with distance, duration, tolls, taxi fare, and fuel cost.",
   "main": "scripts/index.ts",
   "scripts": {
     "test": "ts-node scripts/index.ts --start '126.8912,37.5088' --goal '127.4342,36.3323'",
@@ -21,8 +21,6 @@
     "directions",
     "routing",
     "navigation",
-    "geocoding",
-    "address-lookup",
     "route-planning",
     "openclaw"
   ],
@@ -33,4 +31,3 @@
     "url": "https://github.com/yourusername/ncloud-maps-skill"
   }
 }
-

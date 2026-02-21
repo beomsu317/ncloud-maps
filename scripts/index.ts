@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Ncloud Maps Directions15 + Directions5 + Geocoding API CLI
+ * Ncloud Maps Directions15 + Directions5 CLI
  * 
  * 환경변수:
  *   NCLOUD_API_KEY_ID: 네이버클라우드 API Key ID
  *   NCLOUD_API_KEY: 네이버클라우드 API Key
  * 
  * 사용 예:
- *   npx ts-node scripts/index.ts --start "강남역" --goal "신도림역" --api directions15
- *   npx ts-node scripts/index.ts --start "강남역" --goal "신도림역" --api directions5 --waypoints "서울역"
  *   npx ts-node scripts/index.ts --start "127.0683,37.4979" --goal "126.9034,37.5087"
+ *   npx ts-node scripts/index.ts --start "127.0683,37.4979" --goal "126.9034,37.5087" --waypoints "127.0100,37.5000"
  */
 
 import { getDirections } from "../lib/directions";
@@ -59,23 +58,21 @@ async function main() {
   if (!params.start || !params.goal) {
     console.error(
       "❌ 에러: --start와 --goal 파라미터가 필요합니다.\n\n" +
-        "사용 방법: index.ts --start <주소 또는 좌표> --goal <주소 또는 좌표> [옵션]\n\n" +
+        "사용 방법: index.ts --start <경도,위도> --goal <경도,위도> [옵션]\n\n" +
         "API 선택:\n" +
         "  --api smart         (기본값, 경유지 5개 미만: Directions5 / 5개 이상: Directions15)\n" +
         "  --api directions15  (항상 Directions15, 최대 15개 경유지)\n" +
         "  --api directions5   (항상 Directions5, 최대 5개 경유지)\n\n" +
         "예시:\n" +
         "  # Smart (기본값, 경유지 개수에 따라 자동 선택):\n" +
-        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역'\n" +
-        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --waypoints '서울역|용산역|옥수역|성동구청역|광나루역' (→ 5개이상, Directions15 사용)\n\n" +
+        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087'\n" +
+        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087' --waypoints '127.0100,37.5000|127.0200,37.5100'\n\n" +
         "  # 명시적으로 Directions5 사용:\n" +
-        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --api directions5 --waypoints '서울역|용산역'\n\n" +
+        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087' --api directions5\n\n" +
         "  # 명시적으로 Directions15 사용:\n" +
-        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --api directions15 --waypoints '서울역|용산역|옥수역|성동구청역|광나루역'\n\n" +
-        "  # 좌표로 검색:\n" +
-        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087'\n\n" +
+        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087' --api directions15 --waypoints '127.0100,37.5000|127.0200,37.5100'\n\n" +
         "  # 경로 옵션:\n" +
-        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --option 'traavoidtoll'"
+        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087' --option 'traavoidtoll'"
     );
     process.exit(1);
   }

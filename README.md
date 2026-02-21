@@ -1,6 +1,6 @@
 # Ncloud Maps
 
-🗺️ **Naver Cloud Maps API integration for OpenClaw** - Convert addresses to coordinates and calculate driving routes with real-time traffic data.
+🗺️ **Naver Cloud Maps API integration for OpenClaw** - Calculate driving routes with real-time traffic data.
 
 [![npm version](https://img.shields.io/npm/v/ncloud-maps-skill.svg)](https://www.npmjs.com/package/ncloud-maps-skill)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -13,11 +13,6 @@
 - **Automatic selection** - No configuration needed; choose based on waypoint count
 - **Manual override** - Force specific API with `--api` flag if needed
 
-🗺️ **Geocoding API** - Convert addresses to coordinates
-- Support Korean addresses (주소)
-- English address lookup
-- Coordinate validation
-
 🛣️ **Directions APIs** - Calculate optimal driving routes
 - Distance (meters)
 - Duration (milliseconds)
@@ -29,7 +24,7 @@
 🔄 **Waypoints Support** - Multi-stop routing
 - Directions5: Up to 5 intermediate stops (auto-selected)
 - Directions15: Up to 15 intermediate stops (auto-selected)
-- Mix addresses and coordinates
+- Coordinates only (longitude,latitude format)
 
 ⚙️ **Route Options**
 - `trafast` - Fastest route
@@ -60,7 +55,7 @@ npm install ncloud-maps-skill
 Get API credentials from [Naver Cloud Console](https://console.ncloud.com):
 
 1. Create/register an Application
-2. Enable "Maps Geocoding" + "Maps Directions15"
+2. Enable "Maps Directions15"
 3. Copy `Client ID` and `Client Secret`
 
 Set environment variables:
@@ -80,18 +75,20 @@ NCLOUD_API_KEY=your-client-secret
 
 **Smart Routing (Default)**
 
+Provide coordinates in `longitude,latitude` format:
+
 ```bash
 # 0-4 waypoints → Automatically uses Directions5 (lighter, faster)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
-  --waypoints "서울역|용산역"
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
+  --waypoints "127.0100,37.5000|127.0200,37.5100"
 
 # 5+ waypoints → Automatically uses Directions15 (supports up to 15 stops)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
-  --waypoints "서울역|용산역|옥수역|성동구청역|광나루역"
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
+  --waypoints "127.0100,37.5000|127.0200,37.5100|127.0300,37.5200|127.0400,37.5300|127.0500,37.5400"
 ```
 
 The skill automatically selects the optimal API. No `--api` flag needed.
@@ -101,27 +98,22 @@ The skill automatically selects the optimal API. No `--api` flag needed.
 ```bash
 # Force Directions5 (max 5 waypoints)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --api directions5 \
-  --waypoints "서울역|용산역"
+  --waypoints "127.0100,37.5000|127.0200,37.5100"
 
 # Force Directions15 (max 15 waypoints)
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --api directions15 \
-  --waypoints "서울역|용산역|옥수역|성동구청역|광나루역"
+  --waypoints "127.0100,37.5000|127.0200,37.5100|127.0300,37.5200|127.0400,37.5300|127.0500,37.5400"
 ```
 
 **Other Queries**
 
 ```bash
-# Query by address (Geocoding → Smart Routing)
-npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역"
-
 # Query by coordinates (direct)
 npx ts-node scripts/index.ts \
   --start "127.0683,37.4979" \
@@ -129,8 +121,8 @@ npx ts-node scripts/index.ts \
 
 # With route options
 npx ts-node scripts/index.ts \
-  --start "강남역" \
-  --goal "신도림역" \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087" \
   --option "traavoidtoll"
 ```
 
@@ -139,8 +131,8 @@ npx ts-node scripts/index.ts \
 ```json
 {
   "success": true,
-  "start": "강남역",
-  "goal": "신도림역",
+  "start": "127.0683,37.4979",
+  "goal": "126.9034,37.5087",
   "distance": 12850,
   "duration": 1145000,
   "toll_fare": 0,
@@ -153,11 +145,11 @@ npx ts-node scripts/index.ts \
 ## API Parameters
 
 ### Required
-- `--start` - Starting point (address or longitude,latitude)
-- `--goal` - Destination (address or longitude,latitude)
+- `--start` - Starting point (longitude,latitude format, e.g., 127.0683,37.4979)
+- `--goal` - Destination (longitude,latitude format, e.g., 126.9034,37.5087)
 
 ### Optional
-- `--waypoints` - Intermediate stops, pipe-separated (max 5)
+- `--waypoints` - Intermediate stops in longitude,latitude format, pipe-separated (max 15)
 - `--option` - Route preference (trafast|tracomfort|traoptimal|traavoidtoll|traavoidcaronly)
 - `--cartype` - Vehicle type (1-6)
 - `--fueltype` - Fuel type (gasoline|diesel|lpg)
@@ -169,7 +161,6 @@ npx ts-node scripts/index.ts \
 ```
 ncloud-maps/
 ├── lib/
-│   ├── geocoding.ts       # Address → Coordinate conversion
 │   ├── directions.ts      # Directions15 API integration
 │   ├── directions5.ts     # Directions5 API integration
 │   └── smartDirections.ts # Intelligent routing (auto-select API based on waypoints)
@@ -185,7 +176,6 @@ ncloud-maps/
 
 ## API Endpoints
 
-- **Geocoding**: `https://maps.apigw.ntruss.com/map-geocode/v2/geocode`
 - **Directions5**: `https://maps.apigw.ntruss.com/map-direction/v1/driving` (max 5 waypoints)
 - **Directions15**: `https://maps.apigw.ntruss.com/map-direction-15/v1/driving` (max 15 waypoints)
 
@@ -195,7 +185,7 @@ Common errors and solutions:
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `Geocoding failed` | Address not found | Try different spelling or check region |
+| `좌표 형식 오류` | Invalid coordinate format | Use `longitude,latitude` format (e.g., 127.0683,37.4979) |
 | `Authentication Failed` | Invalid API credentials | Verify NCLOUD_API_KEY_ID & NCLOUD_API_KEY |
 | `Quota Exceeded` | Rate limit hit | Check Naver Cloud Console quota |
 | `No routes found` | Invalid route | Verify start/goal are reachable by car |
@@ -224,7 +214,7 @@ NCLOUD_API_KEY_ID=your-id
 NCLOUD_API_KEY=your-key
 EOF
 
-npx ts-node scripts/index.ts --start "강남역" --goal "신도림역"
+npx ts-node scripts/index.ts --start "127.0683,37.4979" --goal "126.9034,37.5087"
 ```
 
 ## API Limits
@@ -233,13 +223,11 @@ npx ts-node scripts/index.ts --start "강남역" --goal "신도림역"
 |-----|-----------|-------------------|
 | **Directions5** | Max 5 | 0-4 waypoints (default, lighter) |
 | **Directions15** | Max 15 | 5+ waypoints (auto-upgraded) |
-| **Geocoding** | 10 results per query (configurable) | Always |
 | **Rate Limits** | Per your Naver Cloud plan | Both APIs |
 
 ## Resources
 
 - [Naver Cloud Console](https://console.ncloud.com)
-- [Maps Geocoding API Docs](https://api.ncloud-docs.com/docs/ko/application-maps-geocoding)
 - [Maps Directions API Docs](https://api.ncloud-docs.com/docs/ko/application-maps-directions)
 - [OpenClaw Docs](https://docs.openclaw.ai)
 - [ClawHub](https://clawhub.com)
@@ -254,6 +242,13 @@ Pull requests welcome! Please follow existing code style.
 
 ## Changelog
 
+### v1.1.0 (2026-02-21)
+- **Remove Geocoding API** - Simplify to coordinates-only input
+- Coordinates must be in `longitude,latitude` format
+- Update documentation to reflect coordinate-only usage
+- Maintain backward compatibility with explicit `--api` flag
+- Smart Directions Routing continues to work automatically
+
 ### v1.0.1 (2026-02-21)
 - **Smart Directions Routing**: Automatically select between Directions5 and Directions15 based on waypoint count
   - 0-4 waypoints: Uses Directions5 (lightweight, optimized)
@@ -266,7 +261,6 @@ Pull requests welcome! Please follow existing code style.
 
 ### v1.0.0 (2026-02-21)
 - Initial release
-- Geocoding API integration
 - Directions15 API integration
 - Waypoints support
 - Route options
