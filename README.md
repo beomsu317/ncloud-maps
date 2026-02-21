@@ -225,6 +225,16 @@ npx ts-node scripts/index.ts --start "127.0683,37.4979" --goal "126.9034,37.5087
 | **Directions15** | Max 15 | 5+ waypoints (auto-upgraded) |
 | **Rate Limits** | Per your Naver Cloud plan | Both APIs |
 
+## Limitations
+
+⚠️ **This skill only calculates vehicle (car) routes.** It does not support:
+- Public transportation (subway, bus, etc.)
+- Walking routes
+- Multi-modal journeys
+- Transit-specific features (fare, stops, schedules)
+
+For those use cases, use transit-specific APIs (e.g., Kakao Map, Naver Map Transit API).
+
 ## Resources
 
 - [Naver Cloud Console](https://console.ncloud.com)

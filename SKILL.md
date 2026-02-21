@@ -183,10 +183,21 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 2. **Route Calculation (Directions15 or Directions5)**
    - Coordinates sent to appropriate Directions API
    - Returns distance, duration, tolls, taxi fare, fuel cost
+   - **Only for vehicle (car) routes** — not for pedestrian or public transit
 
 3. **Waypoints Support**
    - Each waypoint must be in `longitude,latitude` format
    - All coordinates sent to Directions API
+
+## Limitations
+
+⚠️ **This skill only calculates vehicle (car) routes.** It does not support:
+- Public transportation (subway, bus, etc.)
+- Walking routes
+- Multi-modal journeys
+- Transit-specific features (fare, stops, schedules)
+
+For those use cases, use transit-specific APIs (e.g., Kakao Map, Naver Map Transit API).
 
 ## Environment Variables
 
