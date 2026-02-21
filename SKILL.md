@@ -1,6 +1,6 @@
 ---
 name: ncloud-maps
-description: Query Naver Cloud Platform Maps APIs for route navigation and geocoding. Use when you need to find driving routes, calculate distance/duration/tolls, or convert addresses to coordinates. Smart routing: defaults to Directions5, automatically switches to Directions15 for 5+ waypoints. Supports route options, vehicle types, and fuel settings.
+description: "Query Naver Cloud Maps APIs for route navigation and geocoding. Smart routing: Directions5 by default, auto-switches to Directions15 for 5+ waypoints."
 ---
 
 # Ncloud Maps
