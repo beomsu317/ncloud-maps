@@ -1,6 +1,6 @@
 {
   "name": "ncloud-maps-skill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Naver Cloud Maps Directions15 + Geocoding API skill for OpenClaw. Convert addresses to coordinates and calculate driving routes with distance, duration, tolls, taxi fare, and fuel cost.",
   "main": "scripts/index.ts",
   "scripts": {

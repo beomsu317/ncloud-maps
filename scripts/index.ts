@@ -1,20 +1,24 @@
 #!/usr/bin/env node
 
 /**
- * Ncloud Maps Directions15 + Geocoding API CLI
+ * Ncloud Maps Directions15 + Directions5 + Geocoding API CLI
  * 
  * 환경변수:
  *   NCLOUD_API_KEY_ID: 네이버클라우드 API Key ID
  *   NCLOUD_API_KEY: 네이버클라우드 API Key
  * 
  * 사용 예:
- *   npx ts-node scripts/index.ts --start "아현역" --goal "파미르 테니스장"
- *   npx ts-node scripts/index.ts --start "127.1058342,37.359708" --goal "129.075986,35.179470"
- *   npx ts-node scripts/index.ts --start "서울역" --goal "부산역" --waypoints "대전역"
+ *   npx ts-node scripts/index.ts --start "강남역" --goal "신도림역" --api directions15
+ *   npx ts-node scripts/index.ts --start "강남역" --goal "신도림역" --api directions5 --waypoints "서울역"
+ *   npx ts-node scripts/index.ts --start "127.0683,37.4979" --goal "126.9034,37.5087"
  */
 
 import { getDirections } from "../lib/directions";
+import { getDirections5 } from "../lib/directions5";
+import { getSmartDirections } from "../lib/smartDirections";
 import type { DirectionsParams } from "../lib/directions";
+import type { Directions5Params } from "../lib/directions5";
+import type { SmartDirectionsParams } from "../lib/smartDirections";
 
 async function main() {
   // 환경변수에서 인증 정보 읽기
@@ -30,9 +34,10 @@ async function main() {
 
   // 커맨드라인 argument 파싱
   const args = process.argv.slice(2);
-  const params: Partial<DirectionsParams> = {
+  const params: Partial<DirectionsParams & Directions5Params & SmartDirectionsParams & { api: string }> = {
     apiKeyId,
     apiKey,
+    api: "smart", // 기본값: 경유지 개수에 따라 자동 선택
   };
 
   for (let i = 0; i < args.length; i += 2) {
@@ -47,6 +52,7 @@ async function main() {
     else if (key === "fueltype") params.fueltype = value;
     else if (key === "mileage") params.mileage = parseFloat(value);
     else if (key === "lang") params.lang = value;
+    else if (key === "api") params.api = value.toLowerCase();
   }
 
   // 필수 파라미터 검증
@@ -54,20 +60,37 @@ async function main() {
     console.error(
       "❌ 에러: --start와 --goal 파라미터가 필요합니다.\n\n" +
         "사용 방법: index.ts --start <주소 또는 좌표> --goal <주소 또는 좌표> [옵션]\n\n" +
+        "API 선택:\n" +
+        "  --api smart         (기본값, 경유지 5개 미만: Directions5 / 5개 이상: Directions15)\n" +
+        "  --api directions15  (항상 Directions15, 최대 15개 경유지)\n" +
+        "  --api directions5   (항상 Directions5, 최대 5개 경유지)\n\n" +
         "예시:\n" +
-        "  # 주소로 검색:\n" +
-        "  npx ts-node scripts/index.ts --start '아현역' --goal '파미르테니스장'\n" +
-        "  npx ts-node scripts/index.ts --start '서울역' --goal '부산역' --waypoints '대전역|전주역'\n\n" +
-        "  # 좌표로 검색 (경도,위도):\n" +
-        "  npx ts-node scripts/index.ts --start '127.1058342,37.359708' --goal '129.075986,35.179470'\n\n" +
-        "  # 혼합:\n" +
-        "  npx ts-node scripts/index.ts --start '아현역' --goal '129.075986,35.179470' --option 'traavoidtoll'"
+        "  # Smart (기본값, 경유지 개수에 따라 자동 선택):\n" +
+        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역'\n" +
+        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --waypoints '서울역|용산역|옥수역|성동구청역|광나루역' (→ 5개이상, Directions15 사용)\n\n" +
+        "  # 명시적으로 Directions5 사용:\n" +
+        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --api directions5 --waypoints '서울역|용산역'\n\n" +
+        "  # 명시적으로 Directions15 사용:\n" +
+        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --api directions15 --waypoints '서울역|용산역|옥수역|성동구청역|광나루역'\n\n" +
+        "  # 좌표로 검색:\n" +
+        "  npx ts-node scripts/index.ts --start '127.0683,37.4979' --goal '126.9034,37.5087'\n\n" +
+        "  # 경로 옵션:\n" +
+        "  npx ts-node scripts/index.ts --start '강남역' --goal '신도림역' --option 'traavoidtoll'"
     );
     process.exit(1);
   }
 
   try {
-    const result = await getDirections(params as DirectionsParams);
+    let result;
+
+    if (params.api === "directions5") {
+      result = await getDirections5(params as Directions5Params);
+    } else if (params.api === "directions15") {
+      result = await getDirections(params as DirectionsParams);
+    } else {
+      // 기본값: Smart Directions (경유지 개수에 따라 자동 선택)
+      result = await getSmartDirections(params as SmartDirectionsParams);
+    }
 
     if (!result.success) {
       console.error(`\n❌ 실패: ${result.error}`);

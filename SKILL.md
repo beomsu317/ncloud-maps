@@ -1,11 +1,20 @@
 ---
 name: ncloud-maps
-description: Query Naver Cloud Platform Maps APIs for route navigation and geocoding. Use when you need to find driving routes, calculate distance/duration/tolls, or convert addresses to coordinates. Automatically converts addresses to coordinates using Geocoding API before finding routes. Supports waypoints, route options, vehicle types, and fuel settings.
+description: Query Naver Cloud Platform Maps APIs for route navigation and geocoding. Use when you need to find driving routes, calculate distance/duration/tolls, or convert addresses to coordinates. Smart routing: defaults to Directions5, automatically switches to Directions15 for 5+ waypoints. Supports route options, vehicle types, and fuel settings.
 ---
 
 # Ncloud Maps
 
-Query Naver Cloud Maps APIs for routing (Directions15) and address-to-coordinate conversion (Geocoding).
+Query Naver Cloud Maps APIs for intelligent routing (Directions5 + Directions15) and address-to-coordinate conversion (Geocoding).
+
+## Key Feature: Smart Routing
+
+**v1.0.1+** — By default, the skill uses **Directions5** for queries with fewer than 5 waypoints, and automatically switches to **Directions15** when you have 5 or more waypoints. No manual selection needed.
+
+| Waypoints | API Used | Max Waypoints |
+|-----------|----------|---------------|
+| 0–4       | Directions5 | 5 |
+| 5+        | Directions15 | 15 |
 
 ## Setup
 
@@ -35,6 +44,64 @@ npm install
 ```
 
 ## Usage
+
+### Smart Routing (Default Behavior)
+
+By default, no `--api` flag needed. The skill automatically:
+- Uses **Directions5** for 0–4 waypoints (faster)
+- Switches to **Directions15** for 5+ waypoints (necessary)
+
+```bash
+# 0–4 waypoints → Directions5 (automatic)
+npx ts-node scripts/index.ts \
+  --start "강남역" \
+  --goal "신도림역" \
+  --waypoints "서울역|용산역"
+
+# 5+ waypoints → Directions15 (automatic)
+npx ts-node scripts/index.ts \
+  --start "강남역" \
+  --goal "신도림역" \
+  --waypoints "서울역|용산역|옥수역|성동구청역|광나루역"
+```
+
+### Basic route query by address (Geocoding → Smart Directions)
+
+```bash
+npx ts-node scripts/index.ts \
+  --start "강남역" \
+  --goal "신도림역"
+```
+
+Automatically resolves both addresses to coordinates, then queries the route.
+
+### Route query by coordinates (direct)
+
+```bash
+npx ts-node scripts/index.ts \
+  --start "127.0683,37.4979" \
+  --goal "126.9034,37.5087"
+```
+
+### Force specific API (optional)
+
+If you need to override the smart routing:
+
+```bash
+# Force Directions5 (max 5 waypoints)
+npx ts-node scripts/index.ts \
+  --start "강남역" \
+  --goal "신도림역" \
+  --api directions5 \
+  --waypoints "서울역|용산역"
+
+# Force Directions15 (max 15 waypoints)
+npx ts-node scripts/index.ts \
+  --start "강남역" \
+  --goal "신도림역" \
+  --api directions15 \
+  --waypoints "서울역|용산역|옥수역|성동구청역|광나루역"
+```
 
 ### Basic route query by address (Geocoding → Directions15)
 
@@ -155,10 +222,16 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 
 ## API Limits
 
+**Smart Routing:**
+- 0–4 waypoints: Directions5 API (max 5 waypoints)
+- 5+ waypoints: Directions15 API (max 15 waypoints)
+
+**Geocoding:**
+- 10 results per query (configurable)
+
+**General:**
 - Max 10 destination alternatives (via `:` separator in goal)
-- Max 5 waypoints (via `|` separator)
 - Real-time traffic information included
-- Geocoding: 10 results per query (configurable)
 - Request rate limits apply per your Naver Cloud plan
 
 ## Error Handling
