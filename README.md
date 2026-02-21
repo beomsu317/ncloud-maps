@@ -252,6 +252,12 @@ Pull requests welcome! Please follow existing code style.
 
 ## Changelog
 
+### v1.0.3 (2026-02-21)
+- **Add limitations documentation** - Clarify vehicle-only routes
+- Document that skill only supports car routes
+- Explicitly list unsupported features (public transit, walking, etc.)
+- Prevent ambiguous or incorrect suggestions
+
 ### v1.0.2 (2026-02-21)
 - **Remove all geocoding references** - Complete removal of Geocoding API
 - Remove `lib/geocoding.ts` entirely
