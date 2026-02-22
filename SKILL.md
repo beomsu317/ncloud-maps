@@ -45,6 +45,24 @@ npm install
 
 ## Usage
 
+### Using with goplaces (Address → Coordinates → Direction)
+
+If you have **goplaces** skill installed, use it to convert addresses to coordinates, then pass them to ncloud-maps:
+
+```bash
+# Step 1: Get coordinates from goplaces
+START_COORDS=$(goplaces resolve "아현역, 서울" --json | jq -r '.places[0] | "\(.location.longitude),\(.location.latitude)"')
+GOAL_COORDS=$(goplaces resolve "서초역, 서울" --json | jq -r '.places[0] | "\(.location.longitude),\(.location.latitude)"')
+
+# Step 2: Get direction with ncloud-maps
+npx ts-node scripts/index.ts --start "$START_COORDS" --goal "$GOAL_COORDS"
+```
+
+**Requirements for this workflow:**
+- `goplaces` skill installed
+- `GOOGLE_PLACES_API_KEY` environment variable set
+- `jq` CLI tool for JSON parsing
+
 ### Smart Routing (Default Behavior)
 
 By default, no `--api` flag needed. The skill automatically:
@@ -175,18 +193,23 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 
 ## How It Works
 
-1. **Coordinate Validation**
-   - Input: User provides coordinates in `longitude,latitude` format
+1. **Address Resolution (Optional - with goplaces)**
+   - If using addresses, use `goplaces resolve` to convert to coordinates
+   - Extract `longitude,latitude` from the result
+   - Pass to ncloud-maps
+
+2. **Coordinate Validation**
+   - Input: User provides coordinates in `longitude,latitude` format (direct or from goplaces)
    - Validates format and range
    - Returns error if format is invalid
 
-2. **Route Calculation (Directions15 or Directions5)**
+3. **Route Calculation (Directions15 or Directions5)**
    - Coordinates sent to appropriate Directions API
    - Returns distance, duration, tolls, taxi fare, fuel cost
    - **Only for vehicle (car) routes** — not for pedestrian or public transit
 
-3. **Waypoints Support**
-   - Each waypoint must be in `longitude,latitude` format
+4. **Waypoints Support**
+   - Each waypoint must be in `longitude,latitude` format (direct or from goplaces)
    - All coordinates sent to Directions API
 
 ## Limitations
