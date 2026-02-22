@@ -9,7 +9,7 @@ Query Naver Cloud Maps APIs for intelligent routing (Directions5 + Directions15)
 
 ## Key Feature: Smart Routing
 
-**v1.0.5+** — By default, the skill uses **Directions5** for queries with fewer than 5 waypoints, and automatically switches to **Directions15** when you have 5 or more waypoints. No manual selection needed.
+**v1.0.6+** — By default, the skill uses **Directions5** for queries with fewer than 5 waypoints, and automatically switches to **Directions15** when you have 5 or more waypoints. No manual selection needed.
 
 | Waypoints | API Used | Max Waypoints |
 |-----------|----------|---------------|
