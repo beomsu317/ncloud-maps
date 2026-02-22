@@ -252,6 +252,12 @@ Pull requests welcome! Please follow existing code style.
 
 ## Changelog
 
+### v1.0.5 (2026-02-22)
+- **Support multiple geocoding skills** - More generic, flexible approach
+- Add goplaces and naver-local-search examples
+- Allow users to integrate any geocoding service that returns lon,lat
+- Update documentation to be provider-agnostic
+
 ### v1.0.4 (2026-02-21)
 - **Fix TypeScript build** - Add node types to tsconfig.json
 - Resolve TS2580 "Cannot find name 'process'" error
