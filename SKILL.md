@@ -45,23 +45,39 @@ npm install
 
 ## Usage
 
-### Using with goplaces (Address → Coordinates → Direction)
+### Using with Address-to-Coordinate Skills
 
-If you have **goplaces** skill installed, use it to convert addresses to coordinates, then pass them to ncloud-maps:
+ncloud-maps requires coordinates in `longitude,latitude` format. If you have address-based location data, use one of these compatible skills to convert addresses to coordinates:
+
+**Available Options (choose based on your environment):**
+
+| Skill | Provider | Coordinates | Setup Required |
+|-------|----------|-------------|-----------------|
+| `goplaces` | Google Places API | Yes (lon,lat) | `GOOGLE_PLACES_API_KEY` |
+| `naver-local-search` | Naver Local Search | Yes (lon,lat) | `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` |
+| Custom API | Your choice | Yes (lon,lat) | Your setup |
+
+**Example workflow with goplaces:**
 
 ```bash
-# Step 1: Get coordinates from goplaces
-START_COORDS=$(goplaces resolve "아현역, 서울" --json | jq -r '.places[0] | "\(.location.longitude),\(.location.latitude)"')
-GOAL_COORDS=$(goplaces resolve "서초역, 서울" --json | jq -r '.places[0] | "\(.location.longitude),\(.location.latitude)"')
+# Get coordinates from address
+COORDS=$(goplaces resolve "강남역, 서울" --json | jq -r '.places[0] | "\(.location.longitude),\(.location.latitude)"')
 
-# Step 2: Get direction with ncloud-maps
-npx ts-node scripts/index.ts --start "$START_COORDS" --goal "$GOAL_COORDS"
+# Use coordinates with ncloud-maps
+npx ts-node scripts/index.ts --start "$COORDS" --goal "127.0049,37.4947"
 ```
 
-**Requirements for this workflow:**
-- `goplaces` skill installed
-- `GOOGLE_PLACES_API_KEY` environment variable set
-- `jq` CLI tool for JSON parsing
+**Example workflow with naver-local-search:**
+
+```bash
+# Get coordinates from address
+COORDS=$(naver-local-search search "강남역" --format json | jq -r '.[0] | "\(.x),\(.y)"')
+
+# Use coordinates with ncloud-maps
+npx ts-node scripts/index.ts --start "$COORDS" --goal "127.0049,37.4947"
+```
+
+**Or integrate any other geocoding service** that returns `longitude,latitude` coordinates.
 
 ### Smart Routing (Default Behavior)
 
@@ -193,13 +209,13 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
 
 ## How It Works
 
-1. **Address Resolution (Optional - with goplaces)**
-   - If using addresses, use `goplaces resolve` to convert to coordinates
-   - Extract `longitude,latitude` from the result
-   - Pass to ncloud-maps
+1. **Address Resolution (Optional - any geocoding skill)**
+   - Use any available skill that provides coordinates (goplaces, naver-local-search, etc.)
+   - Extract `longitude,latitude` format from the result
+   - Pass coordinates to ncloud-maps
 
 2. **Coordinate Validation**
-   - Input: User provides coordinates in `longitude,latitude` format (direct or from goplaces)
+   - Input: Coordinates in `longitude,latitude` format (direct input or from geocoding skill)
    - Validates format and range
    - Returns error if format is invalid
 
@@ -209,7 +225,7 @@ Fuel types: `gasoline` (default), `highgradegasoline`, `diesel`, `lpg`
    - **Only for vehicle (car) routes** — not for pedestrian or public transit
 
 4. **Waypoints Support**
-   - Each waypoint must be in `longitude,latitude` format (direct or from goplaces)
+   - Each waypoint must be in `longitude,latitude` format
    - All coordinates sent to Directions API
 
 ## Limitations
