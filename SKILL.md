@@ -5,16 +5,32 @@ description: "Query Naver Cloud Maps APIs for route navigation. Smart routing: D
 
 ## Prompt
 
-When a user requests a route calculation with addresses or coordinates, use this skill to calculate driving time, distance, and cost.
+When a user asks for driving directions, route calculation, distance, time, or transportation costs between two locations:
 
-**Usage:**
-- `/skill ncloud-maps <start> <goal> [waypoints]`
-- Start and goal must be in `longitude,latitude` format OR addresses (convert using goplaces/naver-local-search first)
-- Returns: distance, duration, toll fare, taxi fare, fuel cost
+1. **If user provides addresses** (e.g., "아현역에서 서초역까지"):
+   - Use a geocoding skill (goplaces, naver-local-search) to convert addresses to coordinates
+   - Pass coordinates to ncloud-maps
 
-**Examples:**
-- `/skill ncloud-maps "126.9633,37.5524" "127.0165,37.4889"` (coordinates)
-- `/skill ncloud-maps 아현역 서초역` (addresses - requires geocoding skill first)
+2. **If user provides coordinates** (e.g., "126.96,37.55"):
+   - Directly use ncloud-maps to calculate the route
+
+**How to call this skill:**
+```
+/skill ncloud-maps <start-coordinates> <goal-coordinates>
+```
+
+**Parameters:**
+- `<start-coordinates>`: Format `longitude,latitude` (e.g., `126.9633,37.5524`)
+- `<goal-coordinates>`: Format `longitude,latitude` (e.g., `127.0165,37.4889`)
+- Optional: `--waypoints` for intermediate stops
+
+**What it returns:**
+- Distance (meters)
+- Duration (milliseconds → convert to seconds/minutes)
+- Toll fare (KRW)
+- Estimated taxi fare (KRW)
+- Estimated fuel cost (KRW)
+- Route type: Directions5 (default, 0-4 waypoints) or Directions15 (5+ waypoints)
 
 # Ncloud Maps
 
