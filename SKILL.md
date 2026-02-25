@@ -3,6 +3,19 @@ name: ncloud-maps
 description: "Query Naver Cloud Maps APIs for route navigation. Smart routing: Directions5 by default, auto-switches to Directions15 for 5+ waypoints."
 ---
 
+## Prompt
+
+When a user requests a route calculation with addresses or coordinates, use this skill to calculate driving time, distance, and cost.
+
+**Usage:**
+- `/skill ncloud-maps <start> <goal> [waypoints]`
+- Start and goal must be in `longitude,latitude` format OR addresses (convert using goplaces/naver-local-search first)
+- Returns: distance, duration, toll fare, taxi fare, fuel cost
+
+**Examples:**
+- `/skill ncloud-maps "126.9633,37.5524" "127.0165,37.4889"` (coordinates)
+- `/skill ncloud-maps 아현역 서초역` (addresses - requires geocoding skill first)
+
 # Ncloud Maps
 
 Query Naver Cloud Maps APIs for intelligent routing (Directions5 + Directions15).
