@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-dist/
 
 # Environment variables (keep API keys secret!)
 .env
@@ -23,9 +22,8 @@ Thumbs.db
 npm-debug.log*
 
 # Build outputs
-*.js
+!dist/
 *.d.ts
-!scripts/index.js (if compiled)
 
 # Test coverage
 coverage/
